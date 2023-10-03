@@ -16,5 +16,6 @@ namespace SurfUpRedux.Data
         }
 
         public DbSet<Board> Board { get; set; } = default!;
+        public DbSet<Booking> Bookings{ get; set; } = default!;
     }
 }
