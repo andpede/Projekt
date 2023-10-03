@@ -1,5 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
@@ -47,8 +46,9 @@ namespace SurfUpRedux.Models
         [Display(Name = "Link til billede")]
         public string? ImageUrl { get; set; }
 
-        //public int? BookingId { get; set; }
-        //public virtual Booking Booking { get; set; }
+        public int? BookingId { get; set; }
+        
+        public virtual Booking? Booking { get; set; }
     }
 }
 

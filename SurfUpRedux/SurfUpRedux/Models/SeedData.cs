@@ -5,7 +5,7 @@ using SurfUpRedux.Models;
 using System;
 using System.Linq;
 
-namespace MvcMovie.Models
+namespace SurfUpRedux.Models
 {
     public static class SeedData
     {
@@ -16,12 +16,12 @@ namespace MvcMovie.Models
                     DbContextOptions<SurfUpReduxContext>>()))
             {
                 // Look for any movies.
-                if (context.Board.Any())
+                if (context.Boards.Any())
                 {
                     return;   // DB has been seeded
                 }
 
-                context.Board.AddRange(
+                context.Boards.AddRange(
                     new Board
                     {
                         Name = "The Minilog",
