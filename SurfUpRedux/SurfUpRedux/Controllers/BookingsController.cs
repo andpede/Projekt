@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,28 +14,30 @@ namespace SurfUpRedux.Controllers
     public class BookingsController : Controller
     {
         private readonly SurfUpReduxContext _context;
+        private readonly UserManager<SurfUpUser> _userManager;
 
-        public BookingsController(SurfUpReduxContext context)
+        public BookingsController(SurfUpReduxContext context, UserManager<SurfUpUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var surfUpReduxContext = _context.Bookings.Include(b => b.Board).Include(b => b.User);
+            var surfUpReduxContext = _context.Booking.Include(b => b.Board).Include(b => b.User);
             return View(await surfUpReduxContext.ToListAsync());
         }
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Bookings == null)
+            if (id == null || _context.Booking == null)
             {
                 return NotFound();
             }
 
-            var booking = await _context.Bookings
+            var booking = await _context.Booking
                 .Include(b => b.Board)
                 .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -47,10 +50,22 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Bookings/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+
+            // If the logged-in user has the Admin or Manager role
+            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
+            }
+            else
+            {
+                // Otherwise, just list the logged-in user
+                var user = await _userManager.GetUserAsync(User);
+                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email");
+            }
+
             return View();
         }
 
@@ -75,12 +90,12 @@ namespace SurfUpRedux.Controllers
         // GET: Bookings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Bookings == null)
+            if (id == null || _context.Booking == null)
             {
                 return NotFound();
             }
 
-            var booking = await _context.Bookings.FindAsync(id);
+            var booking = await _context.Booking.FindAsync(id);
             if (booking == null)
             {
                 return NotFound();
@@ -130,12 +145,12 @@ namespace SurfUpRedux.Controllers
         // GET: Bookings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Bookings == null)
+            if (id == null || _context.Booking == null)
             {
                 return NotFound();
             }
 
-            var booking = await _context.Bookings
+            var booking = await _context.Booking
                 .Include(b => b.Board)
                 .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -152,14 +167,14 @@ namespace SurfUpRedux.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Bookings == null)
+            if (_context.Booking == null)
             {
                 return Problem("Entity set 'SurfUpReduxContext.Bookings'  is null.");
             }
-            var booking = await _context.Bookings.FindAsync(id);
+            var booking = await _context.Booking.FindAsync(id);
             if (booking != null)
             {
-                _context.Bookings.Remove(booking);
+                _context.Booking.Remove(booking);
             }
             
             await _context.SaveChangesAsync();
@@ -168,7 +183,7 @@ namespace SurfUpRedux.Controllers
 
         private bool BookingExists(int id)
         {
-          return (_context.Bookings?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_context.Booking?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
