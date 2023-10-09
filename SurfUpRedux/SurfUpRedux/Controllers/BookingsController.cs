@@ -54,14 +54,12 @@ namespace SurfUpRedux.Controllers
         {
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
 
-            // If the logged-in user has the Admin or Manager role
             if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
             }
             else
             {
-                // Otherwise, just list the logged-in user
                 var user = await _userManager.GetUserAsync(User);
                 ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email");
             }
@@ -76,18 +74,20 @@ namespace SurfUpRedux.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
         {
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Add(booking);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "An error occurred while saving the booking.");
-                }
+                _context.Add(booking);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
             }
 
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
