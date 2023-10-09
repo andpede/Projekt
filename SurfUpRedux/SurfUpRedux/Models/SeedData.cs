@@ -196,6 +196,7 @@ namespace SurfUpRedux.Models
                     await userManager.CreateAsync(user, defaultPassword);
                     await userManager.AddToRoleAsync(user, "User");
                 }
+
             }
 
             // Seed admin

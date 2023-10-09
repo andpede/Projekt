@@ -74,16 +74,34 @@ namespace SurfUpRedux.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,StartDate,EndDate,BoardId,UserId")] Booking booking)
+        public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(booking);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "An error occurred while saving the booking.");
+                }
             }
+
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", booking.UserId);
+
+            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            {
+                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
+            }
+            else
+            {
+                var user = await _userManager.GetUserAsync(User);
+                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", booking.UserId);
+            }
+
             return View(booking);
         }
 
