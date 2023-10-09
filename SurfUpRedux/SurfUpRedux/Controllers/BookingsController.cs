@@ -74,6 +74,9 @@ namespace SurfUpRedux.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
         {
+            ModelState.Remove("Board");
+            ModelState.Remove("User");
+
             foreach (var modelState in ModelState.Values)
             {
                 foreach (var error in modelState.Errors)

@@ -17,5 +17,23 @@ namespace SurfUpRedux.Data
 
         public DbSet<Board> Board { get; set; } = default!;
         public DbSet<Booking> Booking { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(bo => bo.Board)
+                .WithOne(b => b.Booking)
+                .HasForeignKey<Booking>(bo => bo.BoardId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(bo => bo.User)
+                .WithMany(u => u.Bookings)
+                .HasForeignKey(bo => bo.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
+
     }
 }

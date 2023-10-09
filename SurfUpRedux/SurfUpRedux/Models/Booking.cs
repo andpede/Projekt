@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SurfUpRedux.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SurfUpRedux.Models
@@ -20,11 +21,13 @@ namespace SurfUpRedux.Models
         [ForeignKey("Board")]
         public int BoardId { get; set; }
 
-        public virtual Board Board { get; set; }
+        [IgnoreOnFormSubmit]
+        public Board Board { get; set; }
 
         [ForeignKey("User")]
         public string UserId { get; set; }
 
-        public virtual SurfUpUser User { get; set; }
+        [IgnoreOnFormSubmit]
+        public SurfUpUser User { get; set; }
     }
 }
