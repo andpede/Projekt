@@ -4,12 +4,12 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Oversigt</h1>
 
 <p>
     @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
     {
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Opret nyt board</a>
     }
 </p>
 
@@ -87,11 +87,22 @@
             <td>
                 <img src="@item.ImageUrl" alt="Board Image" style="max-width: 200px;" />
             </td>
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Book</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Slet</a> 
             </td>
+                }
+                @if (User.IsInRole("User"))
+                {
+             <td>
+                <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Book</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a>
+             </td>
+                }
         </tr>
 }
     </tbody>

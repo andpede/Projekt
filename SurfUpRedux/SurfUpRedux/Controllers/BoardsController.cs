@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
@@ -104,7 +106,15 @@ namespace SurfUpRedux.Controllers
                     break;
             }
             int pageSize = 5;
+
+            var availableBoards = _context.Board.Where(board => board.IsAvailable).ToList();
+
             return View(await PaginatedList<Board>.CreateAsync(boards.AsNoTracking(), pageNumber ?? 1, pageSize));
+
+            //int pageSize = 5;
+            //var availableBoards = boards.Where(board => board.IsAvailable).AsNoTracking();
+            //return View(await PaginatedList<Board>.CreateAsync(availableBoards, pageNumber ?? 1, pageSize));
+
         }
 
         // GET: Boards/Details/5
@@ -126,6 +136,7 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Boards/Create
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             return View();
@@ -148,6 +159,7 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Boards/Edit/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Board == null)
@@ -166,6 +178,7 @@ namespace SurfUpRedux.Controllers
         // POST: Boards/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
@@ -199,6 +212,7 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Boards/Delete/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Board == null)
@@ -217,6 +231,7 @@ namespace SurfUpRedux.Controllers
         }
 
         // POST: Boards/Delete/5
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

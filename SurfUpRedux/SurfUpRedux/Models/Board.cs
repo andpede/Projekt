@@ -47,9 +47,12 @@ namespace SurfUpRedux.Models
         [Display(Name = "Link til billede")]
         public string? ImageUrl { get; set; }
 
+        public bool IsAvailable { get; set; }
         public int? BookingId { get; set; }
 
         public Booking? Booking { get; set; }
+
+        
     }
 }
 
