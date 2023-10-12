@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -118,12 +119,7 @@ namespace SurfUpRedux.Controllers
         {
             ModelState.Remove("Board");
             ModelState.Remove("User");
-            //booking.BoardId = boardId;
-
-            //var availableBoards = await _context.Board
-            //                                    .Include(b => b.)
-            //                                    .Where(b => b.board != null && b => b.board.IsAvailable).AsNoTracking();
-
+        
             foreach (var modelState in ModelState.Values)
             {
                 foreach (var error in modelState.Errors)
@@ -132,6 +128,16 @@ namespace SurfUpRedux.Controllers
                 }
             }
 
+
+            if (booking.StartDate > booking.EndDate)
+            {
+                ModelState.AddModelError("StartDate", "Startdate has to be before enddate");
+            }
+            if (booking.EndDate >= booking.StartDate.AddDays(3))
+            {
+                ModelState.AddModelError("Enddate", "You can only book this board for 3 days");
+            }
+             
             if (ModelState.IsValid)
             {
                 _context.Add(booking);
@@ -152,11 +158,7 @@ namespace SurfUpRedux.Controllers
                 ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", booking.UserId);
             }
 
-            //var booking = await _context.Booking
-            //  .Include(b => b.Board)
-            //  .Include(b => b.User)
-            //  .FirstOrDefaultAsync(m => m.Id == id);
-
+          
 
 
             return View(booking);
