@@ -24,11 +24,19 @@
                         </li>
                         @if (User.IsInRole("User") || User.IsInRole("Admin") || User.IsInRole("Manager"))
                         {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Bookings" asp-action="Index">Bookings</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Bookings" asp-action="Index">Bookings</a>
+                            </li>
                         }
-                        
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Brugere</a>
+                            </li>
+                        }
+
+
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

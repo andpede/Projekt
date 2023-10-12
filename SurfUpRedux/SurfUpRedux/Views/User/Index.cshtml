@@ -1,0 +1,32 @@
+@model IEnumerable<SurfUpUser>
+@{
+    ViewBag.Title = "Users";
+}
+<div class="col-md-12">
+    <h3>Bruger liste</h3>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td>
+                            <form method="post" asp-action="Delete" asp-route-userId="@user.Id">
+                                <button type="submit" class="btn shadow-none" onclick="return confirm('Er du sikker?')">Slet</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
