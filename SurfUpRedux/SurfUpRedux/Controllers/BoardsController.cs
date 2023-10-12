@@ -107,16 +107,41 @@ namespace SurfUpRedux.Controllers
             }
             int pageSize = 5;
 
-            var availableBoards = _context.Board.Where(board => board.IsAvailable).ToList();
+            foreach (var board in boards)
+            {
+                // Assume the board is initially available
+                board.IsAvailable = true;
+
+                var boardBookings = _context.Booking.Where(booking => booking.BoardId == board.Id);
+
+                foreach (var booking in boardBookings)
+                {
+                    if (booking.StartDate < DateTime.Now && booking.EndDate > DateTime.Now)
+                    {
+                        // The board is booked for the current time
+                        board.IsAvailable = false;
+                        break; // No need to check other bookings
+                    }
+                }
+
+                // Update the board's availability status in the database
+                _context.Update(board);
+            }
+
+            
+            await _context.SaveChangesAsync();
+
+            boards = from b in boards
+                     where (b.IsAvailable == true)
+                     select b;
+
+
 
             return View(await PaginatedList<Board>.CreateAsync(boards.AsNoTracking(), pageNumber ?? 1, pageSize));
 
-            //int pageSize = 5;
-            //var availableBoards = boards.Where(board => board.IsAvailable).AsNoTracking();
-            //return View(await PaginatedList<Board>.CreateAsync(availableBoards, pageNumber ?? 1, pageSize));
-
+           
         }
-
+     
         // GET: Boards/Details/5
         public async Task<IActionResult> Details(int? id)
         {
