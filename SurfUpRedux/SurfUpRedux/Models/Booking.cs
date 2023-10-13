@@ -29,5 +29,7 @@ namespace SurfUpRedux.Models
 
         [IgnoreOnFormSubmit]
         public SurfUpUser User { get; set; }
+        
+        public byte[] RowVersion { get; set; }
     }
 }

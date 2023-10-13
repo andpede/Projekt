@@ -27,12 +27,17 @@ namespace SurfUpRedux.Data
                 .WithOne(b => b.Booking)
                 .HasForeignKey<Booking>(bo => bo.BoardId)
                 .OnDelete(DeleteBehavior.Cascade);
+               
 
             modelBuilder.Entity<Booking>()
                 .HasOne(bo => bo.User)
                 .WithMany(u => u.Bookings)
                 .HasForeignKey(bo => bo.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.RowVersion).IsRowVersion();
+
         }
 
     }
