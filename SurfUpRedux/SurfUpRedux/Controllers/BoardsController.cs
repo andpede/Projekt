@@ -200,13 +200,11 @@ namespace SurfUpRedux.Controllers
             return View(board);
         }
 
-        // POST: Boards/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Boards/Edit/5 
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl,RowVersion")] Board board)
         {
             if (id != board.Id)
             {
@@ -217,8 +215,31 @@ namespace SurfUpRedux.Controllers
             {
                 try
                 {
-                    _context.Update(board);
-                    await _context.SaveChangesAsync();
+                    var existingBoard = await _context.Board.FindAsync(id);
+
+                    if (existingBoard == null)
+                    {
+                        return NotFound();
+                    }
+
+                    if (ModelState.IsValid)
+                    {
+                        // Compare the RowVersion of the existing board with the submitted board
+                        if (existingBoard.RowVersion.SequenceEqual(board.RowVersion))
+                        {
+                            // If the RowVersions match, update the board and increment the RowVersion
+                            _context.Entry(existingBoard).CurrentValues.SetValues(board);
+                            existingBoard.RowVersion = BitConverter.GetBytes(DateTime.Now.Ticks);
+
+                            await _context.SaveChangesAsync();
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            // Display a message indicating that the board has already been edited
+                            ModelState.AddModelError("", "The board has already been edited by another user. Please refresh the page to get the latest data.");
+                        }
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -231,10 +252,10 @@ namespace SurfUpRedux.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(board);
         }
+
 
         // GET: Boards/Delete/5
         [Authorize(Roles = "Admin,Manager")]
@@ -281,3 +302,4 @@ namespace SurfUpRedux.Controllers
         }
     }
 }
+

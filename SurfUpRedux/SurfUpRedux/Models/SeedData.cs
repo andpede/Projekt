@@ -42,7 +42,8 @@ namespace SurfUpRedux.Models
                         Type = "Shortboard",
                         Price = 565,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/9455175_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/9455175_orig.jpg",
+                        RowVersion = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -55,7 +56,8 @@ namespace SurfUpRedux.Models
                         Type = "Funboard",
                         Price = 685,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/1768109_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/1768109_orig.jpg",
+                        RowVersion = new byte[] { 1, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -68,7 +70,8 @@ namespace SurfUpRedux.Models
                         Type = "Funboard",
                         Price = 695,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/7016725_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/7016725_orig.jpg",
+                        RowVersion = new byte[] { 2, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -81,7 +84,8 @@ namespace SurfUpRedux.Models
                         Type = "Fish",
                         Price = 645,
                         Equipment = null,
-                        ImageUrl = "https://kite-prod.b-cdn.net/19205-home_default/slingshot-flying-fish-v2-2023-wing-foilboard.jpg"
+                        ImageUrl = "https://kite-prod.b-cdn.net/19205-home_default/slingshot-flying-fish-v2-2023-wing-foilboard.jpg",
+                        RowVersion = new byte[] { 3, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -94,7 +98,8 @@ namespace SurfUpRedux.Models
                         Type = "Longboard",
                         Price = 895,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/6384943_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/6384943_orig.jpg",
+                        RowVersion = new byte[] { 4, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -107,7 +112,8 @@ namespace SurfUpRedux.Models
                         Type = "Shortboard",
                         Price = 645,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/_3074463_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/_3074463_orig.jpg",
+                        RowVersion = new byte[] { 5, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -120,7 +126,8 @@ namespace SurfUpRedux.Models
                         Type = "Longboard",
                         Price = 1025,
                         Equipment = null,
-                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/_9897519_orig.jpg"
+                        ImageUrl = "https://www.light-surfboards.com/uploads/5/7/3/0/57306051/_9897519_orig.jpg",
+                        RowVersion = new byte[] { 6, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -133,7 +140,8 @@ namespace SurfUpRedux.Models
                         Type = "SUP",
                         Price = 854,
                         Equipment = "Paddle",
-                        ImageUrl = "https://kite-prod.b-cdn.net/9006-thickbox_default/jp-carbon-pro-83-2021-ctl-paddle.jpg"
+                        ImageUrl = "https://kite-prod.b-cdn.net/9006-thickbox_default/jp-carbon-pro-83-2021-ctl-paddle.jpg",
+                        RowVersion = new byte[] { 7, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -146,7 +154,8 @@ namespace SurfUpRedux.Models
                         Type = "SUP",
                         Price = 611,
                         Equipment = "Fin, Paddle, Pump, Leash",
-                        ImageUrl = "https://www.light-sup.com/uploads/5/7/3/0/57306051/s795737404132599590_p388_i15_w3002.jpeg?width=640"
+                        ImageUrl = "https://www.light-sup.com/uploads/5/7/3/0/57306051/s795737404132599590_p388_i15_w3002.jpeg?width=640",
+                        RowVersion = new byte[] { 8, 0, 0, 0, 0, 0, 0, 0 }
                     },
 
                     new Board
@@ -159,7 +168,8 @@ namespace SurfUpRedux.Models
                         Type = "SUP",
                         Price = 1304,
                         Equipment = "Fin, Paddle, Pump, Leash",
-                        ImageUrl = "https://www.light-sup.com/uploads/5/7/3/0/57306051/s795737404132599590_p389_i13_w3024.jpeg?width=640"
+                        ImageUrl = "https://www.light-sup.com/uploads/5/7/3/0/57306051/s795737404132599590_p389_i13_w3024.jpeg?width=640",
+                        RowVersion = new byte[] { 9, 0, 0, 0, 0, 0, 0, 0 }
                     }
                 );
                 context.SaveChanges();
