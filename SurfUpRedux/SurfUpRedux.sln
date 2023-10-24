@@ -5,7 +5,7 @@ VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfUpRedux", "SurfUpRedux\SurfUpRedux.csproj", "{247D1E04-991D-40A7-846A-A09663E2668D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfUpAPI", "SurfUpAPI\SurfUpAPI.csproj", "{1DE48A31-7D35-4F0B-BC79-9FE1A2CE547D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurfUpReduxAPI", "SurfUpAPI\SurfUpReduxAPI.csproj", "{1DE48A31-7D35-4F0B-BC79-9FE1A2CE547D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
