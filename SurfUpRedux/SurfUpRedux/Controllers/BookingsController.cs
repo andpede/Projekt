@@ -132,6 +132,15 @@ namespace SurfUpRedux.Controllers
                 }
             }
 
+            if (booking.StartDate > booking.EndDate)
+            {
+                ModelState.AddModelError("StartDate", "Startdate has to be before enddate");
+            }
+            if (booking.EndDate >= booking.StartDate.AddDays(3))
+            {
+                ModelState.AddModelError("Enddate", "You can only book this board for 3 days");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(booking);
