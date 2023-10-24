@@ -34,17 +34,14 @@ namespace SurfUpRedux.Controllers
 
                 return View(await surfUpReduxContext.ToListAsync());
             }
-            else /*if (User.IsInRole("User")) */
+            else 
             {
                 var surfUpReduxContext = _context.Booking.Include(b => b.Board)
                                                          .Include(b => b.User)
                                                          .Where(b => b.UserId == userId);
                 return View(await surfUpReduxContext.ToListAsync());
             }
-            //else
-            //{
-            //    return View();
-            //}
+           
         }
 
         // GET: Bookings/Details/5
@@ -71,15 +68,7 @@ namespace SurfUpRedux.Controllers
         public async Task<IActionResult> Create(int boardId)
         {
 
-            //var userId = _userManager.GetUserId(User);
-
-            //{
-            //    booking.UserId = userId;
-            //    booking.BoardId = boardId;
-            //    booking.BookingS = DateTime.Now;
-            //    booking.BookingEnd = DateTime.Now;
-            //};
-            //return View(booking);
+           
 
             if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
@@ -118,11 +107,7 @@ namespace SurfUpRedux.Controllers
         {
             ModelState.Remove("Board");
             ModelState.Remove("User");
-            //booking.BoardId = boardId;
-
-            //var availableBoards = await _context.Board
-            //                                    .Include(b => b.)
-            //                                    .Where(b => b.board != null && b => b.board.IsAvailable).AsNoTracking();
+          
 
             foreach (var modelState in ModelState.Values)
             {
@@ -161,15 +146,13 @@ namespace SurfUpRedux.Controllers
                 ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", booking.UserId);
             }
 
-            //var booking = await _context.Booking
-            //  .Include(b => b.Board)
-            //  .Include(b => b.User)
-            //  .FirstOrDefaultAsync(m => m.Id == id);
-
+         
 
 
             return View(booking);
         }
+
+
 
         // GET: Bookings/Edit/5
         [Authorize(Roles = "Admin,Manager")]
@@ -189,6 +172,8 @@ namespace SurfUpRedux.Controllers
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", booking.UserId);
             return View(booking);
         }
+
+
 
         // POST: Bookings/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
