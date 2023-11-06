@@ -23,6 +23,7 @@ namespace SurfUpRedux.Controllers
             _userManager = userManager;
         }
 
+        [Authorize(Roles = "Admin,Manager,User")]
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
@@ -30,9 +31,10 @@ namespace SurfUpRedux.Controllers
             if (User.IsInRole("Admin") || (User.IsInRole("Manager")))
             {
                 var surfUpReduxContext = _context.Booking.Include(b => b.Board).Include(b => b.User);
+
                 return View(await surfUpReduxContext.ToListAsync());
             }
-            else /*if (User.IsInRole("User")) */
+            else if (User.IsInRole("User"))
             {
                 var surfUpReduxContext = _context.Booking.Include(b => b.Board)
                                                          .Include(b => b.User)
@@ -40,12 +42,12 @@ namespace SurfUpRedux.Controllers
 
                 return View(await surfUpReduxContext.ToListAsync());
             }
-            //else
-            //{
-            //    return View();
-            //}
+            {
+                return View();
+            }
         }
 
+        [Authorize(Roles = "Admin,Manager,User")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Booking == null)
@@ -66,92 +68,73 @@ namespace SurfUpRedux.Controllers
             return View(booking);
         }
 
+        [Authorize(Roles = "Admin,Manager,User")]
         public async Task<IActionResult> Create(int boardId)
         {
-
-            //var userId = _userManager.GetUserId(User);
-
-            //{
-            //    booking.UserId = userId;
-            //    booking.BoardId = boardId;
-            //    booking.BookingS = DateTime.Now;
-            //    booking.BookingEnd = DateTime.Now;
-            //};
-            //return View(booking);
-
             if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
-                ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
+                var board = await _context.Board.FindAsync(boardId);
+                if (board == null || !board.IsAvailable)
+                {
+                    return NotFound();
+                }
+                ViewData["BoardId"] = new SelectList(new List<Board> { board }, "Id", "Name");
                 ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
             }
-            else
+            else if (User.IsInRole("User"))
             {
                 var user = await _userManager.GetUserAsync(User);
-
                 ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email");
-                
-                var board = await _context.Board.FindAsync(boardId);
 
-                if (board != null)
+                var board = await _context.Board.FindAsync(boardId);
+                if (board == null || !board.IsAvailable)
                 {
-                    ViewData["BoardId"] = new SelectList(new List<Board> { board }, "Id", "Name");
+                    return NotFound();
                 }
-                else
-                {
-                    
-                    return NotFound(); 
-                }
+                ViewData["BoardId"] = new SelectList(new List<Board> { board }, "Id", "Name");
             }
 
             return View();
         }
 
+
+
+        [Authorize(Roles = "Admin,Manager,User")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
         {
             ModelState.Remove("Board");
             ModelState.Remove("User");
-            //booking.BoardId = boardId;
-
-            //var availableBoards = await _context.Board
-            //                                    .Include(b => b.)
-            //                                    .Where(b => b.board != null && b => b.board.IsAvailable).AsNoTracking();
-
-            foreach (var modelState in ModelState.Values)
-            {
-                foreach (var error in modelState.Errors)
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
-            }
 
             if (ModelState.IsValid)
             {
                 _context.Add(booking);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
 
+                var board = await _context.Board.FindAsync(booking.BoardId);
+                if (board != null)
+                {
+                    board.IsAvailable = false;
+                    _context.Update(board);
+                }
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
             }
 
-          ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
+            // Ved fejl, genopret SelectList for BoardId og UserId afhængigt af brugerrollen.
+            ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
 
-            if (User.IsInRole("Admin") || User.IsInRole("Manager")) 
+            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
             }
             else if (User.IsInRole("User"))
             {
                 var user = await _userManager.GetUserAsync(User);
-                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", booking.UserId);
+                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", user.Id);
             }
-
-            //var booking = await _context.Booking
-            //  .Include(b => b.Board)
-            //  .Include(b => b.User)
-            //  .FirstOrDefaultAsync(m => m.Id == id);
-
-
 
             return View(booking);
         }
@@ -172,7 +155,7 @@ namespace SurfUpRedux.Controllers
             }
 
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", booking.UserId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
 
             return View(booking);
         }
@@ -211,7 +194,7 @@ namespace SurfUpRedux.Controllers
             }
 
             ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", booking.UserId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
 
             return View(booking);
         }

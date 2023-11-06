@@ -10,12 +10,12 @@ namespace SurfUpRedux.Models
 
         [Required]
         [DataType(DataType.Date)]
-        [Display(Name = "Booking Start Date")]
+        [Display(Name = "Start Dato")]
         public DateTime StartDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        [Display(Name = "Booking End Date")]
+        [Display(Name = "Slut Dato")]
         public DateTime EndDate { get; set; }
 
         [ForeignKey("Board")]

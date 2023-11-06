@@ -71,57 +71,57 @@
     <tbody>
         @foreach (var item in Model) 
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Length)'
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Width)''
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Thickness)''
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Volume)L
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Type)
-                </td>
-                <td>
-                    €@Html.DisplayFor(modelItem => item.Price)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Equipment)
-                </td>
-                <td>
-                    <img src="@item.ImageUrl" alt="Board Image" style="max-width: 200px;" />
-                </td>
-                <td>
-                        <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a>
-                </td>
-                @if (isAdminOrManager)
-                {
+            @if (!(User.IsInRole("User") && item.IsAvailable == false))
+            {
+                <tr>
                     <td>
-                        <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Book</a> |
-                        <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Slet</a>
+                        @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td>
-                        @(item.IsAvailable ? "Ledig" : "Booket")
+                        @Html.DisplayFor(modelItem => item.Length)'
                     </td>
-                }
-                @if (User.IsInRole("User"))
-                {
                     <td>
-                        <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Book</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a>
+                        @Html.DisplayFor(modelItem => item.Width)''
                     </td>
-                }
-            </tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Thickness)''
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Volume)L
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        €@Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Equipment)
+                    </td>
+                    <td>
+                        <img src="@item.ImageUrl" alt="Board Image" style="max-width: 200px;" />
+                    </td>
+                    @if (isAdminOrManager)
+                    {
+                        <td>
+                            <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Udlej</a> |
+                            <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |
+                            <a asp-action="Delete" asp-route-id="@item.Id">Slet</a>
+                        </td>
+                        <td>
+                            @(item.IsAvailable ? "Ledig" : "Booket")
+                        </td>
+                    }
+                    @if (User.IsInRole("User"))
+                    {
+                        <td>
+                            <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Udlej</a> |
+                            <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a>
+                        </td>
+                    }
+                </tr>
+            }
         }
     </tbody>
 </table>

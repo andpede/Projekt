@@ -5,10 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Detaljer for udlejningen</h1>
 
 <div>
-    <h4>Booking</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -24,20 +23,23 @@
             @Html.DisplayFor(model => model.EndDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Board)
+            Surfbræt
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Board.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
+            Bruger
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
+            @Html.DisplayFor(model => model.User.Email)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (User.IsInRole("Admin,Manager"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.Id">Rediger</a>
+    }
+    <a asp-action="Index">Tilbage til listen</a>
 </div>

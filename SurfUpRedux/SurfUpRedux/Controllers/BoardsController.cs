@@ -165,7 +165,6 @@ namespace SurfUpRedux.Controllers
                 CreateAsync(boards.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        // GET: Boards/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Board == null)
@@ -192,6 +191,7 @@ namespace SurfUpRedux.Controllers
 
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -225,8 +225,6 @@ namespace SurfUpRedux.Controllers
             return View(board);
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
