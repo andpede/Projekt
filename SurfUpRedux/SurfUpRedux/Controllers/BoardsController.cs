@@ -23,17 +23,34 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Boards - Modificeret med søgefunktion
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, 
+            string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
-            ViewData["LengthSortParm"] = sortOrder == "Length" ? "Length_desc" : "Length";
-            ViewData["WidthSortParm"] = sortOrder == "Width" ? "Width_desc" : "Width";
-            ViewData["ThicknessSortParm"] = sortOrder == "Thickness" ? "Thickness_desc" : "Thickness";
-            ViewData["VolumeSortParm"] = sortOrder == "Volume" ? "Volume_desc" : "Volume";
-            ViewData["TypeSortParm"] = sortOrder == "Type" ? "type_desc" : "Type";
-            ViewData["PriceSortParm"] = sortOrder == "Price" ? "Price_desc" : "Price";
-            ViewData["EquipmentSortParm"] = sortOrder == "Equipment" ? "Equipment_desc" : "Equipment";
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? 
+                "Name_desc" : "";
+
+            ViewData["LengthSortParm"] = sortOrder == "Length" ? 
+                "Length_desc" : "Length";
+
+            ViewData["WidthSortParm"] = sortOrder == "Width" ? 
+                "Width_desc" : "Width";
+
+            ViewData["ThicknessSortParm"] = sortOrder == "Thickness" ? 
+                "Thickness_desc" : "Thickness";
+
+            ViewData["VolumeSortParm"] = sortOrder == "Volume" ? 
+                "Volume_desc" : "Volume";
+
+            ViewData["TypeSortParm"] = sortOrder == "Type" ? 
+                "type_desc" : "Type";
+
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? 
+                "Price_desc" : "Price";
+
+            ViewData["EquipmentSortParm"] = sortOrder == "Equipment" ? 
+                "Equipment_desc" : "Equipment";
 
             if (searchString != null)
             {
@@ -43,78 +60,109 @@ namespace SurfUpRedux.Controllers
             {
                 searchString = currentFilter;
             }
+
             ViewData["CurrentFilter"] = searchString;
 
             var boards = from b in _context.Board
                          select b;
+
+            // Tjekker om brugeren er Admin eller Manager
+            bool isAdminOrManager = User.IsInRole("Admin") || User.IsInRole("Manager");
+
+            if (!isAdminOrManager)
+            {
+                // Hvis brugeren ikke er Admin eller Manager, vis kun tilgængelige boards
+                boards = boards.Where(b => b.IsAvailable);
+            }
+
             if (!String.IsNullOrEmpty(searchString))
             {
-                boards = boards.Where(b => b.Name.Contains(searchString) || b.Length.ToString().Contains(searchString)
-                || b.Width.ToString().Contains(searchString) || b.Thickness.ToString().Contains(searchString) ||
-                b.Volume.ToString().Contains(searchString) || b.Type.Contains(searchString) ||
-                b.Price.ToString().Contains(searchString) || (b.Equipment != null && b.Equipment.Contains(searchString)));
+                boards = boards.Where(b => b.Name.Contains(searchString) || 
+                    b.Length.ToString().Contains(searchString) || 
+                    b.Width.ToString().Contains(searchString) || 
+                    b.Thickness.ToString().Contains(searchString) ||
+                    b.Volume.ToString().Contains(searchString) || 
+                    b.Type.Contains(searchString) || 
+                    b.Price.ToString().Contains(searchString) || 
+                    (b.Equipment != null && b.Equipment.Contains(searchString)));
             }
+
             switch (sortOrder)
             {
                 case "Name_desc":
                     boards = boards.OrderByDescending(b => b.Name);
                     break;
+
                 case "Length":
                     boards = boards.OrderBy(b => b.Length);
                     break;
+
                 case "Length_desc":
                     boards = boards.OrderByDescending(b => b.Length);
                     break;
+
                 case "Width":
                     boards = boards.OrderBy(b => b.Width);
                     break;
-                case "Widt_desc":
+
+                case "Width_desc":
                     boards = boards.OrderByDescending(b => b.Width);
                     break;
+
                 case "Thickness":
                     boards = boards.OrderBy(b => b.Thickness);
                     break;
+
                 case "Thickness_desc":
                     boards = boards.OrderByDescending(b => b.Thickness);
                     break;
+
                 case "Volume":
                     boards = boards.OrderBy(b => b.Volume);
                     break;
+
                 case "Volume_desc":
                     boards = boards.OrderByDescending(b => b.Volume);
                     break;
+
                 case "Type":
                     boards = boards.OrderBy(b => b.Type);
                     break;
+
                 case "Type_desc":
                     boards = boards.OrderByDescending(b => b.Type);
                     break;
+
                 case "Price":
                     boards = boards.OrderBy(b => b.Price);
                     break;
+
                 case "Price_desc":
                     boards = boards.OrderByDescending(b => b.Price);
                     break;
+
                 case "Equipment":
-                    boards = boards.OrderBy(b => b.Equipment != null ? 0 : 1).ThenBy(b => b.Equipment);
+                    boards = boards.OrderBy(b => b.Equipment != null ? 0 : 1)
+                        .ThenBy(b => b.Equipment);
                     break;
+
                 case "Equipment_desc":
-                    boards = boards.OrderByDescending(b => b.Equipment != null ? 0 : 1).ThenBy(b => b.Equipment);
+                    boards = boards.OrderByDescending(b => b.Equipment != null ? 0 : 1)
+                        .ThenBy(b => b.Equipment);
                     break;
+
                 default:
                     boards = boards.OrderBy(b => b.Name);
                     break;
             }
+
+            // Her sendes data til index view, som angiver om brugeren er Admin eller Manager
+            ViewData["IsAdminOrManager"] = isAdminOrManager;
+
             int pageSize = 5;
 
-            var availableBoards = _context.Board.Where(board => board.IsAvailable).ToList();
-
-            return View(await PaginatedList<Board>.CreateAsync(boards.AsNoTracking(), pageNumber ?? 1, pageSize));
-
-            //int pageSize = 5;
-            //var availableBoards = boards.Where(board => board.IsAvailable).AsNoTracking();
-            //return View(await PaginatedList<Board>.CreateAsync(availableBoards, pageNumber ?? 1, pageSize));
-
+            return View(await PaginatedList<Board>.
+                CreateAsync(boards.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Boards/Details/5
@@ -127,6 +175,7 @@ namespace SurfUpRedux.Controllers
 
             var board = await _context.Board
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (board == null)
             {
                 return NotFound();
@@ -135,19 +184,18 @@ namespace SurfUpRedux.Controllers
             return View(board);
         }
 
-        // GET: Boards/Create
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Boards/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
+        public async Task<IActionResult> Create(
+            [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
         {
             if (ModelState.IsValid)
             {
@@ -155,10 +203,10 @@ namespace SurfUpRedux.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(board);
         }
 
-        // GET: Boards/Edit/5
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -168,20 +216,22 @@ namespace SurfUpRedux.Controllers
             }
 
             var board = await _context.Board.FindAsync(id);
+
             if (board == null)
             {
                 return NotFound();
             }
+
             return View(board);
         }
 
-        // POST: Boards/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
+        public async Task<IActionResult> Edit(int id, 
+            [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
         {
             if (id != board.Id)
             {
@@ -206,12 +256,13 @@ namespace SurfUpRedux.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(board);
         }
 
-        // GET: Boards/Delete/5
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -222,6 +273,7 @@ namespace SurfUpRedux.Controllers
 
             var board = await _context.Board
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (board == null)
             {
                 return NotFound();
@@ -230,7 +282,6 @@ namespace SurfUpRedux.Controllers
             return View(board);
         }
 
-        // POST: Boards/Delete/5
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -240,13 +291,16 @@ namespace SurfUpRedux.Controllers
             {
                 return Problem("Entity set 'SurfUpReduxContext.Board'  is null.");
             }
+
             var board = await _context.Board.FindAsync(id);
+
             if (board != null)
             {
                 _context.Board.Remove(board);
             }
             
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
