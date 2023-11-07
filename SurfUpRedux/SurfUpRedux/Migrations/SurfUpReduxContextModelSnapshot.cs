@@ -204,7 +204,7 @@ namespace SurfUpRedux.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Board");
+                    b.ToTable("Board", (string)null);
                 });
 
             modelBuilder.Entity("SurfUpRedux.Models.Booking", b =>
@@ -235,7 +235,7 @@ namespace SurfUpRedux.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Booking");
+                    b.ToTable("Booking", (string)null);
                 });
 
             modelBuilder.Entity("SurfUpRedux.Models.SurfUpUser", b =>

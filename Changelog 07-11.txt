@@ -1,0 +1,14 @@
+1. Færdiggjorde implementationen af SurfUpUsersController og dertilhørende views.
+2. 
+
+To-do: 
+
+Validation på dates for en booking. 
+
+Når en booking løber ud, skal den automatisk sættes til isAvailable = true og booking skal slettes. 
+
+Skift sprog på loginsiden og velkomstsiden til dansk.
+
+Concurrency.
+
+API.

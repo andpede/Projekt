@@ -1,0 +1,26 @@
+﻿@model SurfUpRedux.Models.SurfUpUser
+
+@{
+    ViewData["Title"] = "Fjern bruger";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Fjern bruger</h1>
+
+<h3>Er du sikker på at du vil fjerne denne bruger?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Bruger
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+    </dl>
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" name="userId" value="@Model.Id" />
+        <input type="submit" value="Fjern" class="btn btn-danger" /> |
+        <a asp-action="Index">Tilbage til listen</a>
+    </form>
+</div>
