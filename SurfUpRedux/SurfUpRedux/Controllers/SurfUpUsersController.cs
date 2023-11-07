@@ -44,7 +44,7 @@ namespace SurfUpRedux.Controllers
         }
 
         [Authorize(Roles = "Admin,Manager")]
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string userId)
         {
