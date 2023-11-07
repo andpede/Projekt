@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -113,23 +111,30 @@ namespace SurfUpRedux.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
-        {            
+        {
+            ModelState.Remove("Board");
+            ModelState.Remove("User");
+            //booking.BoardId = boardId;
 
-            var UserId = _userManager.GetUserId(User);
-            string URL = $"https://localhost:7203/api/v1.0/Booking/Book";
-            HttpClient client = new HttpClient();
+            //var availableBoards = await _context.Board
+            //                                    .Include(b => b.)
+            //                                    .Where(b => b.board != null && b => b.board.IsAvailable).AsNoTracking();
 
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
 
-            booking.UserId = UserId;
-            booking.StartDate = DateTime.Now;
-            
+            if (ModelState.IsValid)
+            {
+                _context.Add(booking);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
 
-            await client.PostAsJsonAsync(URL, booking);
-
-            return RedirectToAction(nameof(Index));
-        
-
-        }
+            }
 
         //[Authorize(Roles = "Admin,Manager,User")]
         //[HttpPost]
@@ -155,18 +160,11 @@ namespace SurfUpRedux.Controllers
         //        return RedirectToAction(nameof(Index));
         //    }
 
-        //    // Ved fejl, genopret SelectList for BoardId og UserId afhÃ¦ngigt af brugerrollen.
-        //    ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
+            //var booking = await _context.Booking
+            //  .Include(b => b.Board)
+            //  .Include(b => b.User)
+            //  .FirstOrDefaultAsync(m => m.Id == id);
 
-        //    if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-        //    {
-        //        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
-        //    }
-        //    else if (User.IsInRole("User"))
-        //    {
-        //        var user = await _userManager.GetUserAsync(User);
-        //        ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", user.Id);
-        //    }
 
         //    return View(booking);
         //}
