@@ -1,0 +1,27 @@
+1. Optimeret implementationen af koden som gør et bræt usynligt når det er booket.
+
+2. Implementeret en indikator for bookingstatus for bræt når Admin eller Manager er logget ind.
+
+3. Slettet unødvendig kode samt rettet en fejl vedrørende Switchen i boards.cs.
+
+4. Refactoret kode i samtlige klasser og views så det fremstår mere læseligt. 
+
+5. Tilføjet roller i metoder som manglede det i BookingsController.cs.
+
+6. Ændrede sprog til dansk hvor det var relevant.
+
+7. Ændrede booking views+controller til at vise email istedet for ID.
+
+8. Færdiggjorde implementationen af SurfUpUsersController og dertilhørende views.
+
+9. Concurrency implementeret for BoardsController.
+	- Note: Jeg kan ikke implementere concurrency for booking 
+			uden at ødelægge booking funktionaliteten (Krav 4, del 2.).
+
+10. Fjernet IsAvailable fra seeddata.
+
+11. Validation på datoer ved booking.
+
+12. Når en booking slettes, så sættes det associeret boards IsAvailable = true.
+
+13. Når en booking løber ud (efter 5 dage), bliver den automatisk slettes.

@@ -26,6 +26,13 @@ namespace SurfUpRedux.Controllers
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, 
             string searchString, int? pageNumber)
         {
+            // Identificerer bookinger, der er mere end 5 dage gamle
+            var forældedeBookinger = _context.Booking
+                .Where(b => b.EndDate < DateTime.Now.AddDays(-5));
+
+            _context.Booking.RemoveRange(forældedeBookinger);
+            await _context.SaveChangesAsync();
+
             ViewData["CurrentSort"] = sortOrder;
 
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? 
@@ -210,12 +217,16 @@ namespace SurfUpRedux.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
+            // Hvis id er null, eller Board er ikke tilgængelig, returner 'NotFound'
             if (id == null || _context.Board == null)
             {
                 return NotFound();
             }
 
-            var board = await _context.Board.FindAsync(id);
+            // Hent boardet uden at spore det i context for at forbedre ydeevnen
+            var board = await _context.Board
+                .AsNoTracking() // Her anvendes AsNoTracking for at undgå tracking af entiteten
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (board == null)
             {
@@ -229,37 +240,107 @@ namespace SurfUpRedux.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, 
-            [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl")] Board board)
+            [Bind("Id,Name,Length,Width,Thickness,Volume,Type,Price,Equipment,ImageUrl,RowVersion")] 
+                Board board, byte[] rowVersion)
         {
+            // Hvis board id ikke matcher det overførte id, returner 'NotFound'
             if (id != board.Id)
             {
                 return NotFound();
             }
 
+            // Sæt den originale RowVersion til den værdi, som blev sendt fra viewet
+            _context.Entry(board).Property("RowVersion").OriginalValue = rowVersion;
+
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Opdater boardet i context
                     _context.Update(board);
+                    // Forsøg at gemme ændringerne i databasen
                     await _context.SaveChangesAsync();
+                    // Hvis succesfuld, redirect til 'Index'
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
-                    if (!BoardExists(board.Id))
+                    var exceptionEntry = ex.Entries.Single(); // Få den berørte entitet
+                    var clientValues = (Board)exceptionEntry.Entity; // Værdier fra klienten
+                    var databaseEntry = await exceptionEntry.GetDatabaseValuesAsync(); // Hent nuværende værdier fra databasen
+
+                    if (databaseEntry == null)
                     {
-                        return NotFound();
+                        // Hvis databasen entry er null, er boardet blevet slettet af en anden bruger
+                        ModelState.AddModelError(string.Empty, "Kan ikke gemme ændringerne. Boardet blev slettet af en anden bruger.");
                     }
                     else
                     {
-                        throw;
+                        // Hvis databasen har de nuværende værdier, sammenlign dem med klientens værdier
+                        var databaseValues = (Board)databaseEntry.ToObject();
+
+                        // Tilføj modelfejl for hver værdi der er forskellig fra databasens værdier
+                        if (databaseValues.Name != clientValues.Name)
+                        {
+                            ModelState.AddModelError("Name", $"Nuværende værdi: {databaseValues.Name}");
+                        }
+                        if (databaseValues.Length != clientValues.Length)
+                        {
+                            ModelState.AddModelError("Length", $"Nuværende værdi: {databaseValues.Length}");
+                        }
+                        if (databaseValues.Width != clientValues.Width)
+                        {
+                            ModelState.AddModelError("Width", $"Nuværende værdi: {databaseValues.Width}");
+                        }
+                        if (databaseValues.Thickness != clientValues.Thickness)
+                        {
+                            ModelState.AddModelError("Thickness", $"Nuværende værdi: {databaseValues.Thickness}");
+                        }
+                        if (databaseValues.Volume != clientValues.Volume)
+                        {
+                            ModelState.AddModelError("Volume", $"Nuværende værdi: {databaseValues.Volume}");
+                        }
+                        if (databaseValues.Type != clientValues.Type)
+                        {
+                            ModelState.AddModelError("Type", $"Nuværende værdi: {databaseValues.Type}");
+                        }
+                        if (databaseValues.Price != clientValues.Price)
+                        {
+                            ModelState.AddModelError("Price", $"Nuværende værdi: {databaseValues.Price}");
+                        }
+                        if (databaseValues.Equipment != clientValues.Equipment)
+                        {
+                            ModelState.AddModelError("Equipment", $"Nuværende værdi: {databaseValues.Equipment}");
+                        }
+                        if (databaseValues.ImageUrl != clientValues.ImageUrl)
+                        {
+                            ModelState.AddModelError("ImageUrl", $"Nuværende værdi: {databaseValues.ImageUrl}");
+                        }
+
+                        // Sæt RowVersion til den nye værdi hentet fra databasen
+                        board.RowVersion = (byte[])databaseValues.RowVersion;
+                        // Fjern den gamle RowVersion værdi fra ModelState
+                        ModelState.Remove("RowVersion");
+
+                        ModelState.AddModelError(string.Empty, "Det board du forsøgte at redigere "
+                                + "er blevet ændret af en anden bruger efter du modtog de originale værdier. "
+                                + "Redigeringsoperationen er blevet annulleret, og de nuværende værdier fra databasen "
+                                + "er blevet vist. Hvis du stadig ønsker at redigere dette board, klik "
+                                + "'Gem' knappen igen. Ellers klik 'Tilbage til liste' linket.");
                     }
                 }
-
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    // Håndter andre mulige fejl og vis en fejlmeddelelse
+                    ModelState.AddModelError(string.Empty, "Kan ikke gemme ændringer. Prøv igen, og hvis problemet vedvarer, "
+                        + "kontakt systemadministratoren.");
+                }
             }
 
+            // Hvis vi når her, er der sket en fejl, så vi viser formen igen med fejlene
             return View(board);
         }
+
 
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)

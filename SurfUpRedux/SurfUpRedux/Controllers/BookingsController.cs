@@ -22,6 +22,14 @@ namespace SurfUpRedux.Controllers
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<IActionResult> Index()
         {
+            // Identificerer bookinger, der er mere end 5 dage gamle
+            var forældedeBookinger = _context.Booking
+                .Where(b => b.EndDate < DateTime.Now.AddDays(-5));
+
+            _context.Booking.RemoveRange(forældedeBookinger);
+
+            await _context.SaveChangesAsync();
+
             var userId = _userManager.GetUserId(User);
 
             if (User.IsInRole("Admin") || (User.IsInRole("Manager")))
@@ -104,19 +112,38 @@ namespace SurfUpRedux.Controllers
             ModelState.Remove("User");
 
             if (ModelState.IsValid)
-            {
-                _context.Add(booking);
-
-                var board = await _context.Board.FindAsync(booking.BoardId);
-                if (board != null)
+            {             
+                if (booking.StartDate >= booking.EndDate)
                 {
-                    board.IsAvailable = false;
-                    _context.Update(board);
+                    ModelState.AddModelError("EndDate", "Slutdato skal være efter startdatoen.");
                 }
 
-                await _context.SaveChangesAsync();
+                if (booking.StartDate < DateTime.Today)
+                {
+                    ModelState.AddModelError("StartDate", "Booking skal være fra nu af og frem.");
+                }
 
-                return RedirectToAction(nameof(Index));
+                TimeSpan duration = booking.EndDate - booking.StartDate;
+                if (duration.TotalDays > 5)
+                {
+                    ModelState.AddModelError("EndDate", "Maximum booking er på 5 dage.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    _context.Add(booking);
+
+                    var board = await _context.Board.FindAsync(booking.BoardId);
+                    if (board != null)
+                    {
+                        board.IsAvailable = false;
+                        _context.Update(board);
+                    }
+
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             // Ved fejl, genopret SelectList for BoardId og UserId afhængigt af brugerrollen.
@@ -223,20 +250,32 @@ namespace SurfUpRedux.Controllers
         {
             if (_context.Booking == null)
             {
-                return Problem("Entity set 'SurfUpReduxContext.Bookings'  is null.");
+                return Problem("Entity set 'SurfUpReduxContext.Bookings' er null.");
             }
 
             var booking = await _context.Booking.FindAsync(id);
 
             if (booking != null)
             {
+                // Hent den tilknyttede bræt.
+                var board = await _context.Board.FindAsync(booking.BoardId);
+
+                if (board != null)
+                {
+                    // Sæt IsAvailable-egenskaben for brættet til true.
+                    board.IsAvailable = true;
+                    _context.Update(board);
+                }
+
+                // Fjern bookingen.
                 _context.Booking.Remove(booking);
+
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool BookingExists(int id)
         {

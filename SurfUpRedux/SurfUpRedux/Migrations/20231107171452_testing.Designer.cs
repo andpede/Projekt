@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurfUpRedux.Data;
 
@@ -11,9 +12,11 @@ using SurfUpRedux.Data;
 namespace SurfUpRedux.Migrations
 {
     [DbContext(typeof(SurfUpReduxContext))]
-    partial class SurfUpReduxContextModelSnapshot : ModelSnapshot
+    [Migration("20231107171452_testing")]
+    partial class testing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,7 +213,7 @@ namespace SurfUpRedux.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Board", (string)null);
+                    b.ToTable("Board");
                 });
 
             modelBuilder.Entity("SurfUpRedux.Models.Booking", b =>
@@ -241,7 +244,7 @@ namespace SurfUpRedux.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Booking", (string)null);
+                    b.ToTable("Booking");
                 });
 
             modelBuilder.Entity("SurfUpRedux.Models.SurfUpUser", b =>
