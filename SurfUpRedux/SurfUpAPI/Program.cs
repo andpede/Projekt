@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using SurfUpReduxAPI.Data;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
+
 
 
 
@@ -22,27 +24,21 @@ namespace SurfUpAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
             builder.Services.AddHttpClient();
 
+            HttpClient httpClient = new();
+            builder.Services.AddSingleton(typeof(HttpClient), httpClient);
+            builder.Services.AddApiVersioning(Options =>
+            {
+                Options.AssumeDefaultVersionWhenUnspecified = true;
+                Options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                Options.ReportApiVersions = true;
+                Options.ApiVersionReader = ApiVersionReader.Combine(new HeaderApiVersionReader("x-version"));
+            });
 
-            //builder.Services.AddApiVersioning(options =>
-            //{
-            //    options.AssumeDefaultVersionWhenUnspecified = true;
-            //    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
-            //    options.ReportApiVersions = true;
-            //    options.ApiVersionReader = ApiVersionReader.Combine(
-            //        new QueryStringApiVersionReader("api-version"),
-            //        new HeaderApiVersionReader("X-Version"));
-            //    //new MediaTypeApiVersionReader("ver"));
-            //});
 
-            //builder.Services.AddVersionedApiExplorer(
-            //    options =>
-            //    {
-            //        options.GroupNameFormat = "'v'VVV";
-            //        options.SubstituteApiVersionInUrl = true;
-            //    });
-
+           
 
             var app = builder.Build();
 

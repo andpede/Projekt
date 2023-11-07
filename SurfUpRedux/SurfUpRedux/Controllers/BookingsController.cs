@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using SurfUpRedux.Data;
 using SurfUpRedux.Models;
+using SurfUpRedux.Models.ViewModel;
 
 namespace SurfUpRedux.Controllers
 {
@@ -17,10 +24,15 @@ namespace SurfUpRedux.Controllers
         private readonly SurfUpReduxContext _context;
         private readonly UserManager<SurfUpUser> _userManager;
 
-        public BookingsController(SurfUpReduxContext context, UserManager<SurfUpUser> userManager)
+        //Uri baseAddress = new Uri($"https://localhost:7203/api/v1.0/Booking/Book");
+        private readonly HttpClient _client;
+
+        public BookingsController(SurfUpReduxContext context, UserManager<SurfUpUser> userManager, HttpClient client)
         {
             _context = context;
             _userManager = userManager;
+            _client = client;
+            //_client.BaseAddress = baseAddress;  
         }
 
         // GET: Bookings
@@ -98,60 +110,66 @@ namespace SurfUpRedux.Controllers
             return View();
         }
 
-        // POST: Bookings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
-        {
-            ModelState.Remove("Board");
-            ModelState.Remove("User");
-          
+        {            
 
-            foreach (var modelState in ModelState.Values)
-            {
-                foreach (var error in modelState.Errors)
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
-            }
-
-            if (booking.StartDate > booking.EndDate)
-            {
-                ModelState.AddModelError("StartDate", "Startdate has to be before enddate");
-            }
-            if (booking.EndDate >= booking.StartDate.AddDays(3))
-            {
-                ModelState.AddModelError("Enddate", "You can only book this board for 3 days");
-            }
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-
-            }
-
-          ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
-
-            if (User.IsInRole("Admin") || User.IsInRole("Manager")) 
-            {
-                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
-            }
-            else if (User.IsInRole("User"))
-            {
-                var user = await _userManager.GetUserAsync(User);
-                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", booking.UserId);
-            }
-
-         
+            var UserId = _userManager.GetUserId(User);
+            string URL = $"https://localhost:7203/api/v1.0/Booking/Book";
+            HttpClient client = new HttpClient();
 
 
-            return View(booking);
+            booking.UserId = UserId;
+            booking.StartDate = DateTime.Now;
+            
+
+            await client.PostAsJsonAsync(URL, booking);
+
+            return RedirectToAction(nameof(Index));
+        
+
         }
 
+        //[Authorize(Roles = "Admin,Manager,User")]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
+        //{
+        //    ModelState.Remove("Board");
+        //    ModelState.Remove("User");
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(booking);
+
+        //        var board = await _context.Board.FindAsync(booking.BoardId);
+        //        if (board != null)
+        //        {
+        //            board.IsAvailable = false;
+        //            _context.Update(board);
+        //        }
+
+        //        await _context.SaveChangesAsync();
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    // Ved fejl, genopret SelectList for BoardId og UserId afhÃ¦ngigt af brugerrollen.
+        //    ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name", booking.BoardId);
+
+        //    if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        //    {
+        //        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email", booking.UserId);
+        //    }
+        //    else if (User.IsInRole("User"))
+        //    {
+        //        var user = await _userManager.GetUserAsync(User);
+        //        ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email", user.Id);
+        //    }
+
+        //    return View(booking);
+        //}
 
 
         // GET: Bookings/Edit/5

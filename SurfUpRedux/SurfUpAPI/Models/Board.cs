@@ -46,12 +46,13 @@ namespace SurfUpReduxAPI.Models
         public string? ImageUrl { get; set; }
 
         public bool IsAvailable { get; set; } = true;
-
         public int? BookingId { get; set; }
 
         public Booking? Booking { get; set; }
 
-        public ICollection<Booking> bookings { get; set; }
+     
+
+        public ICollection<Booking>? bookings { get; set; }
         
 
     }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SurfUpRedux.Data;
 using SurfUpRedux.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Net.Http;
 
 namespace SurfUpRedux
 {
@@ -13,6 +14,7 @@ namespace SurfUpRedux
     {
         public static async Task Main(string[] args)
         {
+            HttpClient httpClient = new HttpClient();
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<SurfUpReduxContext>(options =>
@@ -25,6 +27,8 @@ namespace SurfUpRedux
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSingleton(typeof(HttpClient), httpClient);
+
 
             var app = builder.Build();
 

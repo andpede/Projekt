@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using SurfUpRedux.Migrations;
 
 namespace SurfUpRedux.Models
 {
@@ -47,7 +48,6 @@ namespace SurfUpRedux.Models
         [Display(Name = "Link til billede")]
         public string? ImageUrl { get; set; }
 
-        public bool IsAvailable { get; set; } = true;
 
         public int? BookingId { get; set; }
 
@@ -55,6 +55,12 @@ namespace SurfUpRedux.Models
         [Timestamp]
         public byte[] RowVersion { get; set; }
 
+        public ICollection<Booking>? bookings { get; set; }
+
+        public bool IsAvailable { get; set; } = true;
+     
+
     }
 }
+
 

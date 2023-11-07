@@ -8,12 +8,10 @@ namespace SurfUpRedux.Models
     {
         public int Id { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Booking Start Date")]
         public DateTime StartDate { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Booking End Date")]
         public DateTime EndDate { get; set; }
@@ -21,13 +19,11 @@ namespace SurfUpRedux.Models
         [ForeignKey("Board")]
         public int BoardId { get; set; }
 
-        [IgnoreOnFormSubmit]
         public Board Board { get; set; }
 
         [ForeignKey("User")]
         public string UserId { get; set; }
 
-        [IgnoreOnFormSubmit]
         public SurfUpUser User { get; set; }
     }
 }
