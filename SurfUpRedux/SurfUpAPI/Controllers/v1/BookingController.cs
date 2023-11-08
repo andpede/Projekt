@@ -30,7 +30,7 @@ namespace SurfUpReduxAPI.Controllers.v1
 
 
         //Create bookings
-        [HttpPost("Book"), ActionName("PostBooking")]
+        [HttpPost("Book")]
 
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
         {
