@@ -57,37 +57,6 @@ namespace SurfUpReduxAPI.Controllers.v1
         }
 
 
-            //[HttpPost("Book")]
-            //public async Task<ActionResult<Board>> Book([FromBody] Booking booking)
-            //{
-
-            //        if (_context.Board == null)
-            //        {
-            //            return Problem("Entity set 'SurfUpReduxContext.Board' is null");
-            //        }
-
-            //       // Booking createBooking = new Booking(booking.StartDate, booking.EndDate, booking.BoardId, booking.UserId);
-            //        //_context.Booking.Add(createBooking);
-            //        //await _context.SaveChangesAsync();
-
-
-            //    var boards = await _context.Board.FindAsync(booking.BoardId);
-            //    if (boards == null)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    boards.bookings = new List<Booking>();
-
-            //    boards.bookings.Add(booking);
-
-
-
-            //    await _context.SaveChangesAsync();
-
-            //    return Ok();
-
-            //}
 
         }
     }
