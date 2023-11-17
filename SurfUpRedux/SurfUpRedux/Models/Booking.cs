@@ -22,8 +22,8 @@ namespace SurfUpRedux.Models
         public Board Board { get; set; }
 
         [ForeignKey("User")]
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
 
-        public SurfUpUser User { get; set; }
+        public SurfUpUser? User { get; set; }
     }
 }

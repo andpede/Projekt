@@ -38,9 +38,22 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Board.Name)
             </td>
+
             <td>
-                @Html.DisplayFor(modelItem => item.User.Email)
-            </td>
+                @if (item.User != null)
+                {
+                    
+                        @Html.DisplayFor(modelItem => item.User.Email)
+                    
+                } 
+                else
+                {
+                    <span>Free Booking</span>
+                }
+                </td>
+                
+
+               
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a> |

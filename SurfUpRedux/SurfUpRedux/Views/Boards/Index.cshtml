@@ -87,6 +87,7 @@
             <td>
                 <img src="@item.ImageUrl" alt="Board Image" style="max-width: 200px;" />
             </td>
+                
                 @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
                 {
             <td>
@@ -96,13 +97,12 @@
                 <a asp-action="Delete" asp-route-id="@item.Id">Slet</a> 
             </td>
                 }
-                @if (User.IsInRole("User"))
-                {
+                
              <td>
                 <a asp-controller="Bookings" asp-action="Create" asp-route-boardId="@item.Id">Book</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Detaljer</a>
              </td>
-                }
+                
         </tr>
 }
     </tbody>

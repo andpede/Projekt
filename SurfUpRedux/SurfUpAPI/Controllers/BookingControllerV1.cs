@@ -14,13 +14,14 @@ namespace SurfUpReduxAPI.Controllers.v1
     [ApiController]
     [ApiVersion("1.0")]
 
-    public class BookingController : ControllerBase
+    public class BookingControllerV1 : ControllerBase
     {
         private readonly SurfUpReduxContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly HttpClient _client;
+       
 
-        public BookingController(SurfUpReduxContext context, UserManager<IdentityUser> userManager, HttpClient client)
+        public BookingControllerV1(SurfUpReduxContext context, UserManager<IdentityUser> userManager, HttpClient client)
         {
             _context = context;
             _userManager = userManager;
@@ -36,6 +37,11 @@ namespace SurfUpReduxAPI.Controllers.v1
         {
             ModelState.Remove("Board");
             ModelState.Remove("User");
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                booking.UserId = null;
+            }
 
             if (ModelState.IsValid)
             {

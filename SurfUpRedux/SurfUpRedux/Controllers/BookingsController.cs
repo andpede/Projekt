@@ -50,11 +50,12 @@ namespace SurfUpRedux.Controllers
             {
                 var surfUpReduxContext = _context.Booking.Include(b => b.Board)
                                                          .Include(b => b.User)
-                                                         .Where(b => b.UserId == userId);
+                                                         .Where(b => b.UserId == userId || string.IsNullOrEmpty(b.UserId));
                 return View(await surfUpReduxContext.ToListAsync());
             }
            
         }
+
 
         // GET: Bookings/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -77,40 +78,47 @@ namespace SurfUpRedux.Controllers
         }
 
         // GET: Bookings/Create
-        public async Task<IActionResult> Create(int boardId)
+        public async Task<IActionResult> Create(int boardId, int? id)
         {
-
-           
-
-            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            if (User.Identity.IsAuthenticated)
             {
-                ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
-                ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
+                if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
+                    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Email");
+                }
+
+                else
+                {
+
+                    var user = await _userManager.GetUserAsync(User);
+                    ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email");
+
+
+                    var board = await _context.Board.FindAsync(boardId);
+                    if (board != null)
+                    {
+                        ViewData["BoardId"] = new SelectList(new List<Board> { board }, "Id", "Name");
+                    }
+                    else
+                    {
+
+                        return NotFound();
+                    }
+
+                }
             }
             else
             {
-
-                var user = await _userManager.GetUserAsync(User);
-                ViewData["UserId"] = new SelectList(new List<SurfUpUser> { user }, "Id", "Email");
-                
-                
-                var board = await _context.Board.FindAsync(boardId);
-                if (board != null)
-                {
-                    ViewData["BoardId"] = new SelectList(new List<Board> { board }, "Id", "Name");
-                }
-                else
-                {
-                    
-                    return NotFound(); 
-                }
-                
+                ViewData["BoardId"] = new SelectList(_context.Board, "Id", "Name");
+                ViewData["UserId"] = new SelectList(new List<SurfUpUser>(), "Id", "Email");
             }
+
 
             return View();
         }
 
-        [Authorize(Roles = "Admin,Manager,User")]
+        [Authorize(Roles = "Admin, Manager, User" )]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("StartDate,EndDate,BoardId,UserId")] Booking booking)
@@ -123,7 +131,19 @@ namespace SurfUpRedux.Controllers
             {
                 try
                 {
-                    string URL = $"https://localhost:7203/api/v1.0/Booking/Book";
+                    string URL;
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        URL = $"https://localhost:7203/api/v1.0/Booking/Book";
+                    }
+                    else  
+                    {
+                        URL = $"https://localhost:7203/api/v2.0/Booking/Book";
+                    }
+
+
+
+
                     HttpClient client = new HttpClient();
 
                     await client.PostAsJsonAsync(URL, booking);

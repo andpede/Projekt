@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurfUpRedux.Data;
 
@@ -11,9 +12,11 @@ using SurfUpRedux.Data;
 namespace SurfUpRedux.Migrations
 {
     [DbContext(typeof(SurfUpReduxContext))]
-    partial class SurfUpReduxContextModelSnapshot : ModelSnapshot
+    [Migration("20231117113303_SetUserIdToBeNullable")]
+    partial class SetUserIdToBeNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
