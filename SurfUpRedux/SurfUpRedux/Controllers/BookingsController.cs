@@ -24,7 +24,6 @@ namespace SurfUpRedux.Controllers
         private readonly SurfUpReduxContext _context;
         private readonly UserManager<SurfUpUser> _userManager;
 
-        //Uri baseAddress = new Uri($"https://localhost:7203/api/v1.0/Booking/Book");
         private readonly HttpClient _client;
 
         public BookingsController(SurfUpReduxContext context, UserManager<SurfUpUser> userManager, HttpClient client)
